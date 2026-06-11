@@ -5,6 +5,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { connectDB } from "./config/db";
 import { SOCKET_EVENTS } from "@chat-app/shared";
+import authRoutes from "./routes/authRoutes";
+import { errorHandler } from "./middleware/errorHandler";
 
 dotenv.config();
 
@@ -13,12 +15,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get("/", (_, res) => {
-  res.json({
-    success: true,
-    message: "Server running successfully",
-  });
-});
+app.use("/auth", authRoutes);
+
+app.use(errorHandler);
 
 const server = http.createServer(app);
 
