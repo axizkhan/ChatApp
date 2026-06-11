@@ -7,6 +7,8 @@ import { connectDB } from "./config/db";
 import { SOCKET_EVENTS } from "@chat-app/shared";
 import authRoutes from "./routes/authRoutes";
 import { errorHandler } from "./middleware/errorHandler";
+import { initializeSockets } from "./sockets";
+import { socketAuthMiddleware } from "./sockets/socketAuth";
 
 dotenv.config();
 
@@ -30,6 +32,9 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   console.log("Socket connected:", socket.id);
 });
+
+io.use(socketAuthMiddleware);
+initializeSockets(io);
 
 const PORT = process.env.PORT || 5000;
 

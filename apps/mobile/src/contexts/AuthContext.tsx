@@ -1,5 +1,7 @@
 import { createContext, ReactNode, useEffect, useState } from "react";
 
+import { socketService } from "../services/socketService";
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type User = {
@@ -47,6 +49,7 @@ export const AuthProvider = ({ children }: Props) => {
       if (storedToken && storedUser) {
         setToken(storedToken);
         setUser(JSON.parse(storedUser));
+        socketService.connect(storedToken);
       }
     } catch (error) {
       console.error(error);
@@ -66,6 +69,7 @@ export const AuthProvider = ({ children }: Props) => {
     await AsyncStorage.setItem("user", JSON.stringify(newUser));
 
     setToken(newToken);
+    socketService.connect(newToken);
   };
 
   const logout = async () => {
@@ -74,6 +78,8 @@ export const AuthProvider = ({ children }: Props) => {
     setToken(null);
 
     setUser(null);
+
+    socketService.disconnect();
   };
 
   return (
