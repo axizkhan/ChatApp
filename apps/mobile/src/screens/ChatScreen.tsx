@@ -6,7 +6,7 @@ import {
   StatusBar,
   StyleSheet,
   View,
-  KeyboardAvoidingView,
+  Keyboard,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -20,6 +20,7 @@ import { MessageInput } from "../components/chat/MessageInput";
 import { ChatHeader } from "../components/chat/ChatHeader";
 import { ConnectionStatusComp } from "../components/chat/ConnectionStatus";
 import { EmptyChat } from "../components/chat/EmptyChat";
+import { KeyboardSafeView } from "../layout/KeyboardSafeView";
 import { useRef, useEffect, useState } from "react";
 
 export const ChatScreen = () => {
@@ -63,11 +64,19 @@ export const ChatScreen = () => {
       setSocketStatus("reconnecting"),
     );
 
+    // Auto scroll to bottom when keyboard opens
+    const kbSub = Keyboard.addListener("keyboardDidShow", () => {
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: true });
+      }, 300);
+    });
+
     return () => {
       socketService.off(SOCKET_EVENTS.RECEIVE_MESSAGE);
       socketService.off("connect");
       socketService.off("disconnect");
       socketService.off("reconnect_attempt");
+      kbSub.remove();
     };
   }, []);
 
@@ -88,11 +97,7 @@ export const ChatScreen = () => {
   }
 
   return (
-    <View
-      style={[
-        styles.container,
-        { paddingTop: insets.top, paddingBottom: insets.bottom },
-      ]}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <StatusBar
         barStyle="dark-content"
         backgroundColor="#FAFAFC"
@@ -102,10 +107,7 @@ export const ChatScreen = () => {
       <ChatHeader onLogout={logout} />
       <ConnectionStatusComp status={socketStatus} />
 
-      <KeyboardAvoidingView
-        style={styles.keyboardAvoider}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}>
+      <KeyboardSafeView style={styles.keyboardAvoider}>
         <FlatList
           ref={flatListRef}
           data={messages}
@@ -129,7 +131,7 @@ export const ChatScreen = () => {
         <View style={styles.inputContainer}>
           <MessageInput onSend={handleSendMessage} />
         </View>
-      </KeyboardAvoidingView>
+      </KeyboardSafeView>
     </View>
   );
 };

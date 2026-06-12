@@ -11,8 +11,8 @@ type Props = {
 
 export const KeyboardSafeView = ({ children, style }: Props) => {
   const insets = useSafeAreaInsets();
-
-  const translateY = useRef(new Animated.Value(0)).current;
+  const initialBottomInset = useRef(insets.bottom).current;
+  const paddingBottom = useRef(new Animated.Value(initialBottomInset)).current;
 
   useEffect(() => {
     const showEvent =
@@ -23,19 +23,21 @@ export const KeyboardSafeView = ({ children, style }: Props) => {
 
     const showSub = Keyboard.addListener(showEvent, (event) => {
       const keyboardHeight = event.endCoordinates.height;
+      // Android keyboard height in edge-to-edge often misses the navigation bar height
+      const offset = Platform.OS === "android" ? 34 : 0;
 
-      Animated.timing(translateY, {
-        toValue: -(keyboardHeight - insets.bottom),
+      Animated.timing(paddingBottom, {
+        toValue: keyboardHeight + offset,
         duration: 250,
-        useNativeDriver: true,
+        useNativeDriver: false,
       }).start();
     });
 
     const hideSub = Keyboard.addListener(hideEvent, () => {
-      Animated.timing(translateY, {
-        toValue: 0,
+      Animated.timing(paddingBottom, {
+        toValue: initialBottomInset,
         duration: 250,
-        useNativeDriver: true,
+        useNativeDriver: false,
       }).start();
     });
 
@@ -43,14 +45,14 @@ export const KeyboardSafeView = ({ children, style }: Props) => {
       showSub.remove();
       hideSub.remove();
     };
-  }, []);
+  }, [initialBottomInset]);
 
   return (
     <Animated.View
       style={[
         style,
         {
-          transform: [{ translateY }],
+          paddingBottom,
         },
       ]}>
       {children}
