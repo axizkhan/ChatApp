@@ -2,9 +2,9 @@ import { Server } from "socket.io";
 
 import { Message } from "../models/Message";
 
-import { SOCKET_EVENTS } from "@chat-app/shared/src/socket/event";
+import { SOCKET_EVENTS } from "@chat-app/shared";
 
-import { SendMessagePayload } from "@chat-app/shared/src/types/socket";
+import { SendMessagePayload } from "@chat-app/shared";
 
 import { User } from "../models/User";
 
@@ -46,7 +46,8 @@ export const initializeSockets = (io: Server) => {
             socket.emit(SOCKET_EVENTS.MESSAGE_SENT, { success: true });
           }
         } catch (error) {
-          if (callback) callback({ success: false, error: "Failed to send message" });
+          if (callback)
+            callback({ success: false, error: "Failed to send message" });
           socket.emit(SOCKET_EVENTS.MESSAGE_ERROR, {
             message: "Failed to send message",
           });

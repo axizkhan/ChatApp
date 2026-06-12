@@ -4,7 +4,6 @@ import { Server } from "socket.io";
 import cors from "cors";
 import dotenv from "dotenv";
 import { connectDB } from "./config/db";
-import { SOCKET_EVENTS } from "@chat-app/shared";
 import authRoutes from "./routes/authRoutes";
 import messageRoutes from "./routes/messageRoutes";
 import { errorHandler } from "./middleware/errorHandler";
