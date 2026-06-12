@@ -50,8 +50,12 @@ class SocketService {
     this.connectionStatus = "disconnected";
   }
 
-  emit(event: string, payload?: unknown) {
-    this.socket?.emit(event, payload);
+  emit(event: string, payload?: unknown, callback?: Function) {
+    if (callback) {
+      this.socket?.emit(event, payload, callback);
+    } else {
+      this.socket?.emit(event, payload);
+    }
   }
 
   on(event: string, callback: (...args: any[]) => void) {

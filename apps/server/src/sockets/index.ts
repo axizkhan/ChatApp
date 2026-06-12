@@ -15,11 +15,12 @@ export const initializeSockets = (io: Server) => {
 
     socket.on(
       SOCKET_EVENTS.SEND_MESSAGE,
-      async (payload: SendMessagePayload) => {
+      async (payload: SendMessagePayload, callback?: Function) => {
         try {
           const user = await User.findById(socket.data.userId);
 
           if (!user) {
+            if (callback) callback({ success: false, error: "User not found" });
             return socket.emit(SOCKET_EVENTS.MESSAGE_ERROR, {
               message: "User not found",
             });
@@ -32,19 +33,20 @@ export const initializeSockets = (io: Server) => {
 
           const message = {
             _id: savedMessage.id,
-
             text: savedMessage.text,
-
             senderId: user.id,
-
             senderName: user.username,
-
             createdAt: savedMessage.createdAt.toISOString(),
           };
 
-          io.emit(SOCKET_EVENTS.RECEIVE_MESSAGE, message);
-          socket.emit(SOCKET_EVENTS.MESSAGE_SENT, { success: true });
+          socket.broadcast.emit(SOCKET_EVENTS.RECEIVE_MESSAGE, message);
+          if (callback) {
+            callback({ success: true, message });
+          } else {
+            socket.emit(SOCKET_EVENTS.MESSAGE_SENT, { success: true });
+          }
         } catch (error) {
+          if (callback) callback({ success: false, error: "Failed to send message" });
           socket.emit(SOCKET_EVENTS.MESSAGE_ERROR, {
             message: "Failed to send message",
           });

@@ -45,7 +45,10 @@ export const MessageBubble = ({ message, isOwnMessage }: Props) => {
             styles.time,
             isOwnMessage ? styles.ownTime : styles.otherTime,
           ]}>
-          {formattedTime}
+          {formattedTime}{" "}
+          {isOwnMessage && message.status === "sending" && "🕒"}
+          {isOwnMessage && message.status === "sent" && "✓"}
+          {isOwnMessage && message.status === "failed" && "⚠️"}
         </Text>
       </View>
     </View>

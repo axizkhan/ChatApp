@@ -82,7 +82,43 @@ export const ChatScreen = () => {
 
   const handleSendMessage = (text: string) => {
     if (!text.trim()) return;
-    socketService.emit(SOCKET_EVENTS.SEND_MESSAGE, { text });
+
+    const tempId = `temp-${Date.now()}`;
+    const optimisticMessage: Message = {
+      _id: tempId,
+      text,
+      senderId: user?.id || "",
+      senderName: user?.username || "",
+      createdAt: new Date().toISOString(),
+      status: "sending",
+    };
+
+    setMessages((prev) => [...prev, optimisticMessage]);
+    setTimeout(() => {
+      flatListRef.current?.scrollToEnd({ animated: true });
+    }, 100);
+
+    socketService.emit(
+      SOCKET_EVENTS.SEND_MESSAGE,
+      { text },
+      (response: any) => {
+        if (response.success && response.message) {
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg._id === tempId
+                ? { ...response.message, status: "sent" }
+                : msg,
+            ),
+          );
+        } else {
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg._id === tempId ? { ...msg, status: "failed" } : msg,
+            ),
+          );
+        }
+      },
+    );
   };
 
   if (loading) {
