@@ -69,6 +69,7 @@ export const AuthProvider = ({ children }: Props) => {
     await AsyncStorage.setItem("user", JSON.stringify(newUser));
 
     setToken(newToken);
+    setUser(newUser);
     socketService.connect(newToken);
   };
 

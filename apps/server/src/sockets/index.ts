@@ -1,5 +1,7 @@
 import { Server } from "socket.io";
 
+import { Message } from "../models/Message";
+
 import { SOCKET_EVENTS } from "@chat-app/shared/src/socket/event";
 
 import { SendMessagePayload } from "@chat-app/shared/src/types/socket";
@@ -22,12 +24,24 @@ export const initializeSockets = (io: Server) => {
               message: "User not found",
             });
           }
-          const message = {
+
+          const savedMessage = await Message.create({
             text: payload.text,
+            sender: user._id,
+          });
+
+          const message = {
+            _id: savedMessage.id,
+
+            text: savedMessage.text,
+
             senderId: user.id,
+
             senderName: user.username,
-            createdAt: new Date().toISOString(),
+
+            createdAt: savedMessage.createdAt.toISOString(),
           };
+
           io.emit(SOCKET_EVENTS.RECEIVE_MESSAGE, message);
           socket.emit(SOCKET_EVENTS.MESSAGE_SENT, { success: true });
         } catch (error) {

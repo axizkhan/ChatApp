@@ -23,7 +23,10 @@ api.interceptors.request.use(async (config) => {
 });
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log(response);
+    return response;
+  },
 
   async (error) => {
     if (error.response?.status === 401) {

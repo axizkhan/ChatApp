@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import { connectDB } from "./config/db";
 import { SOCKET_EVENTS } from "@chat-app/shared";
 import authRoutes from "./routes/authRoutes";
+import messageRoutes from "./routes/messageRoutes";
 import { errorHandler } from "./middleware/errorHandler";
 import { initializeSockets } from "./sockets";
 import { socketAuthMiddleware } from "./sockets/socketAuth";
@@ -18,6 +19,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/auth", authRoutes);
+app.use("/messages", messageRoutes);
 
 app.use(errorHandler);
 
