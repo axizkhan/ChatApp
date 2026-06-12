@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Message } from "@chat-app/shared/src/types/message";
+import { COLORS } from "../../theme/colors";
 
 interface Props {
   message: Message;
@@ -82,7 +83,7 @@ const styles = StyleSheet.create({
   senderName: {
     fontSize: 12,
     fontWeight: "500",
-    color: "#64748B",
+    color: COLORS.textMuted,
     marginLeft: 8,
     marginBottom: 4,
   },
@@ -100,7 +101,7 @@ const styles = StyleSheet.create({
   },
 
   ownBubble: {
-    backgroundColor: "#6366F1",
+    backgroundColor: COLORS.primary,
 
     borderTopLeftRadius: 18,
     borderTopRightRadius: 18,
@@ -109,7 +110,7 @@ const styles = StyleSheet.create({
   },
 
   otherBubble: {
-    backgroundColor: "#F1F1F4",
+    backgroundColor: COLORS.surfaceVariant,
 
     borderTopLeftRadius: 18,
     borderTopRightRadius: 18,
@@ -128,11 +129,11 @@ const styles = StyleSheet.create({
   },
 
   ownText: {
-    color: "#FFFFFF",
+    color: COLORS.textInverse,
   },
 
   otherText: {
-    color: "#09090B",
+    color: COLORS.text,
   },
 
   // Horizontal spacing so text doesn't hit timestamp
@@ -155,6 +156,6 @@ const styles = StyleSheet.create({
   },
 
   otherTime: {
-    color: "#A1A1AA",
+    color: COLORS.textPlaceholder,
   },
 });

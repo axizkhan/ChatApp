@@ -22,7 +22,8 @@ import { ChatHeader } from "../components/chat/ChatHeader";
 import { ConnectionStatusComp } from "../components/chat/ConnectionStatus";
 import { EmptyChat } from "../components/chat/EmptyChat";
 import { KeyboardSafeView } from "../layout/KeyboardSafeView";
-import { useRef, useEffect, useState, useCallback } from "react";
+import { useRef, useEffect, useState, useCallback, useMemo } from "react";
+import { COLORS } from "../theme/colors";
 
 export const ChatScreen = () => {
   const { user, logout } = useAuth();
@@ -158,13 +159,45 @@ export const ChatScreen = () => {
     );
   };
 
+  const listData = useMemo(() => {
+    const data: any[] = [];
+    let lastDate = "";
+
+    messages.forEach((msg) => {
+      const dateStr = new Date(msg.createdAt).toDateString();
+      const today = new Date().toDateString();
+      const yesterday = new Date(Date.now() - 86400000).toDateString();
+
+      let title = dateStr;
+      if (dateStr === today) title = "Today";
+      else if (dateStr === yesterday) title = "Yesterday";
+
+      if (title !== lastDate) {
+        data.push({ _id: `date-${title}`, type: "date", title });
+        lastDate = title;
+      }
+      data.push(msg);
+    });
+
+    return data;
+  }, [messages]);
+
   const renderMessage = useCallback(
-    ({ item }: { item: Message }) => (
-      <MessageBubble
-        message={item}
-        isOwnMessage={item.senderId === user?.id}
-      />
-    ),
+    ({ item }: { item: any }) => {
+      if (item.type === "date") {
+        return (
+          <View style={styles.dateSeparator}>
+            <Text style={styles.dateSeparatorText}>{item.title}</Text>
+          </View>
+        );
+      }
+      return (
+        <MessageBubble
+          message={item}
+          isOwnMessage={item.senderId === user?.id}
+        />
+      );
+    },
     [user?.id],
   );
 
@@ -173,7 +206,7 @@ export const ChatScreen = () => {
       <View style={styles.loaderContainer}>
         <ActivityIndicator
           size="small"
-          color="#6366F1"
+          color={COLORS.primary}
         />
       </View>
     );
@@ -183,7 +216,7 @@ export const ChatScreen = () => {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <StatusBar
         barStyle="dark-content"
-        backgroundColor="#FAFAFC"
+        backgroundColor={COLORS.background}
       />
 
       {/* Header OUTSIDE keyboard handling */}
@@ -193,7 +226,7 @@ export const ChatScreen = () => {
       <KeyboardSafeView style={styles.keyboardAvoider}>
         <FlatList
           ref={flatListRef}
-          data={messages}
+          data={listData}
           keyExtractor={(item) => item._id as string}
           renderItem={renderMessage}
           contentContainerStyle={styles.chatContainer}
@@ -232,7 +265,7 @@ export const ChatScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FAFAFC",
+    backgroundColor: COLORS.background,
   },
 
   keyboardAvoider: {
@@ -243,7 +276,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#FAFAFC",
+    backgroundColor: COLORS.background,
   },
 
   chatContainer: {
@@ -253,7 +286,7 @@ const styles = StyleSheet.create({
   },
 
   inputContainer: {
-    backgroundColor: "#FAFAFC",
+    backgroundColor: COLORS.background,
     paddingHorizontal: 12,
     paddingTop: 8,
     paddingBottom: 8,
@@ -265,7 +298,22 @@ const styles = StyleSheet.create({
   },
   typingText: {
     fontSize: 12,
-    color: "#64748B",
+    color: COLORS.textMuted,
     fontStyle: "italic",
+  },
+
+  dateSeparator: {
+    alignItems: "center",
+    marginVertical: 12,
+  },
+  dateSeparatorText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: COLORS.textMuted,
+    backgroundColor: COLORS.surfaceVariant,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+    overflow: "hidden",
   },
 });

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { COLORS } from "../../theme/colors";
 import {
   StyleSheet,
   TextInput,
@@ -43,7 +44,7 @@ export const MessageInput = ({ onSend, onTyping }: Props) => {
           value={text}
           onChangeText={handleTextChange}
           placeholder="Message..."
-          placeholderTextColor="#A1A1AA"
+          placeholderTextColor={COLORS.textPlaceholder}
           style={styles.input}
           multiline
           maxLength={1000}
@@ -71,7 +72,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderRadius: 24,
     paddingHorizontal: 8,
     paddingVertical: 6,
@@ -91,7 +92,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
-    color: "#09090B",
+    color: COLORS.text,
     paddingHorizontal: 12,
     paddingTop: Platform.OS === "ios" ? 8 : 6,
     paddingBottom: Platform.OS === "ios" ? 8 : 6,
@@ -101,12 +102,12 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: "#6366F1",
+    backgroundColor: COLORS.primary,
     justifyContent: "center",
     alignItems: "center",
   },
   buttonDisabled: {
-    backgroundColor: "#F1F1F4",
+    backgroundColor: COLORS.surfaceVariant,
   },
 
   arrowWrapper: {
@@ -126,22 +127,22 @@ const styles = StyleSheet.create({
     height: 8,
     borderTopWidth: 2,
     borderRightWidth: 2,
-    borderColor: "#A1A1AA",
+    borderColor: COLORS.textPlaceholder,
     transform: [{ rotate: "45deg" }],
     position: "absolute",
     top: 0,
   },
   arrowHeadActive: {
-    borderColor: "#FFFFFF",
+    borderColor: COLORS.textInverse,
   },
   arrowShaft: {
     width: 2,
     height: 10,
-    backgroundColor: "#A1A1AA",
+    backgroundColor: COLORS.textPlaceholder,
     position: "absolute",
     bottom: 0,
   },
   arrowShaftActive: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.textInverse,
   },
 });

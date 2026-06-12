@@ -5,6 +5,7 @@ import {
   View,
   Platform,
 } from "react-native";
+import { COLORS } from "../../theme/colors";
 
 // Optional: If you use an icon library like expo-vector-icons or react-native-vector-icons,
 // you can replace this placeholder with a real feather/lucide icon like <Feather name="log-out" size={20} color="#64748B" />
@@ -41,8 +42,7 @@ export const ChatHeader = ({ onLogout }: Props) => {
 
 const styles = StyleSheet.create({
   wrapper: {
-    // Ensures background color transparency plays nicely with the status bar
-    backgroundColor: "#FAFAFC",
+    backgroundColor: COLORS.background,
   },
   container: {
     height: 64,
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: "700",
-    color: "#09090B", // High-contrast structural ink
+    color: COLORS.text,
     letterSpacing: -0.4,
   },
   statusIndicator: {
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: "#F1F1F4", // Muted button container
+    backgroundColor: COLORS.surfaceVariant,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     height: 8,
     borderTopWidth: 2,
     borderRightWidth: 2,
-    borderColor: "#64748B",
+    borderColor: COLORS.textMuted,
     transform: [{ rotate: "45deg" }],
     position: "absolute",
     right: 2,
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
   iconBar: {
     width: 12,
     height: 2,
-    backgroundColor: "#64748B",
+    backgroundColor: COLORS.textMuted,
     position: "absolute",
     left: 2,
   },
