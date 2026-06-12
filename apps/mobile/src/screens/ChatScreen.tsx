@@ -1,51 +1,37 @@
-import { useEffect, useRef, useState } from "react";
-
+// ChatScreen.tsx
 import {
   ActivityIndicator,
   FlatList,
-  KeyboardAvoidingView,
   Platform,
   StatusBar,
   StyleSheet,
   View,
+  KeyboardAvoidingView,
 } from "react-native";
-
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useAuth } from "../hooks/useAuth";
-
 import { socketService } from "../services/socketService";
-
 import { fetchMessages } from "../services/messageService";
-
 import { SOCKET_EVENTS } from "@chat-app/shared/src/socket/event";
-
 import { Message } from "@chat-app/shared/src/types/message";
-
 import { MessageBubble } from "../components/chat/MessageBubble";
-
 import { MessageInput } from "../components/chat/MessageInput";
-
 import { ChatHeader } from "../components/chat/ChatHeader";
-
 import { ConnectionStatusComp } from "../components/chat/ConnectionStatus";
-
 import { EmptyChat } from "../components/chat/EmptyChat";
+import { useRef, useEffect, useState } from "react";
 
 export const ChatScreen = () => {
   const { user, logout } = useAuth();
-
   const [messages, setMessages] = useState<Message[]>([]);
-
   const [loading, setLoading] = useState(true);
-
   const [socketStatus, setSocketStatus] = useState<
     "connected" | "disconnected" | "reconnecting"
   >("connected");
-
   const flatListRef = useRef<FlatList>(null);
-
   const insets = useSafeAreaInsets();
+  const initialBottomInset = useRef(insets.bottom).current;
 
   useEffect(() => {
     loadMessages();
@@ -54,9 +40,7 @@ export const ChatScreen = () => {
   async function loadMessages() {
     try {
       setLoading(true);
-
       const history = await fetchMessages();
-
       setMessages(history.data);
     } catch (error) {
       console.log("Failed to load messages:", error);
@@ -68,40 +52,27 @@ export const ChatScreen = () => {
   useEffect(() => {
     socketService.on(SOCKET_EVENTS.RECEIVE_MESSAGE, (message: Message) => {
       setMessages((prev) => [...prev, message]);
-
       setTimeout(() => {
-        flatListRef.current?.scrollToEnd({
-          animated: true,
-        });
+        flatListRef.current?.scrollToEnd({ animated: true });
       }, 100);
     });
 
-    socketService.on("connect", () => {
-      setSocketStatus("connected");
-    });
-
-    socketService.on("disconnect", () => {
-      setSocketStatus("disconnected");
-    });
-
-    socketService.on("reconnect_attempt", () => {
-      setSocketStatus("reconnecting");
-    });
+    socketService.on("connect", () => setSocketStatus("connected"));
+    socketService.on("disconnect", () => setSocketStatus("disconnected"));
+    socketService.on("reconnect_attempt", () =>
+      setSocketStatus("reconnecting"),
+    );
 
     return () => {
       socketService.off(SOCKET_EVENTS.RECEIVE_MESSAGE);
-
       socketService.off("connect");
-
       socketService.off("disconnect");
-
       socketService.off("reconnect_attempt");
     };
   }, []);
 
   const handleSendMessage = (text: string) => {
     if (!text.trim()) return;
-
     socketService.emit(SOCKET_EVENTS.SEND_MESSAGE, { text });
   };
 
@@ -115,22 +86,26 @@ export const ChatScreen = () => {
       </View>
     );
   }
+
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View
+      style={[
+        styles.container,
+        { paddingTop: insets.top, paddingBottom: insets.bottom },
+      ]}>
       <StatusBar
         barStyle="dark-content"
         backgroundColor="#FAFAFC"
       />
 
-      {/* Header OUTSIDE KeyboardAvoidingView */}
+      {/* Header OUTSIDE keyboard handling */}
       <ChatHeader onLogout={logout} />
       <ConnectionStatusComp status={socketStatus} />
 
-      {/* KeyboardAvoidingView wraps ONLY the chat content */}
       <KeyboardAvoidingView
         style={styles.keyboardAvoider}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={0}>
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}>
         <FlatList
           ref={flatListRef}
           data={messages}
@@ -141,10 +116,7 @@ export const ChatScreen = () => {
               isOwnMessage={item.senderId === user?.id}
             />
           )}
-          contentContainerStyle={[
-            styles.chatContainer,
-            { paddingBottom: 8 }, // Space so last message isn't hidden
-          ]}
+          contentContainerStyle={styles.chatContainer}
           ListEmptyComponent={<EmptyChat />}
           keyboardDismissMode="on-drag"
           keyboardShouldPersistTaps="handled"
@@ -169,7 +141,7 @@ const styles = StyleSheet.create({
   },
 
   keyboardAvoider: {
-    flex: 1, // Takes remaining space below header
+    flex: 1,
   },
 
   loaderContainer: {
@@ -181,14 +153,14 @@ const styles = StyleSheet.create({
 
   chatContainer: {
     flexGrow: 1,
-    paddingVertical: 20,
-    // paddingBottom handled inline for clarity
+    paddingVertical: 16,
+    paddingBottom: 8,
   },
 
   inputContainer: {
     backgroundColor: "#FAFAFC",
     paddingHorizontal: 12,
     paddingTop: 8,
-    paddingBottom: 20, // Consistent small padding
+    paddingBottom: 8,
   },
 });

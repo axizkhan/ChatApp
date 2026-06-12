@@ -19,7 +19,7 @@ export const MessageBubble = ({ message, isOwnMessage }: Props) => {
         styles.wrapper,
         isOwnMessage ? styles.wrapperRight : styles.wrapperLeft,
       ]}>
-      {/* Sender Name only shows up above external messages */}
+      {/* Sender Name */}
       {!isOwnMessage && message.senderName && (
         <Text style={styles.senderName}>{message.senderName}</Text>
       )}
@@ -35,7 +35,8 @@ export const MessageBubble = ({ message, isOwnMessage }: Props) => {
             isOwnMessage ? styles.ownText : styles.otherText,
           ]}>
           {message.text}
-          {/* Invisible spacer string ensures text doesn't overlap the absolute timestamp */}
+
+          {/* Horizontal spacing for timestamp */}
           <Text style={styles.timeSpacer}>{"      "}</Text>
         </Text>
 
@@ -53,72 +54,97 @@ export const MessageBubble = ({ message, isOwnMessage }: Props) => {
 
 const styles = StyleSheet.create({
   wrapper: {
-    marginVertical: 4,
+    marginVertical: 6,
     paddingHorizontal: 16,
     maxWidth: "85%",
   },
+
   wrapperLeft: {
     alignSelf: "flex-start",
     alignItems: "flex-start",
   },
+
   wrapperRight: {
     alignSelf: "flex-end",
     alignItems: "flex-end",
   },
+
   senderName: {
     fontSize: 12,
     fontWeight: "500",
-    color: "#64748B", // Soft neutral slate
+    color: "#64748B",
     marginLeft: 8,
     marginBottom: 4,
   },
+
   bubble: {
     paddingHorizontal: 16,
     paddingTop: 10,
-    paddingBottom: 12,
-    position: "relative", // Anchors our absolute timestamp seamlessly
+
+    // Extra bottom padding creates breathing room
+    // between message text and timestamp
+    paddingBottom: 18,
+
+    position: "relative",
     minWidth: 64,
   },
+
   ownBubble: {
-    backgroundColor: "#6366F1", // Brand Indigo token
-    // Premium asymmetric squircle radius: drops sharply at the bottom right corner
+    backgroundColor: "#6366F1",
+
     borderTopLeftRadius: 18,
     borderTopRightRadius: 18,
     borderBottomLeftRadius: 18,
     borderBottomRightRadius: 4,
   },
+
   otherBubble: {
-    backgroundColor: "#F1F1F4", // Seamless surface tint token
-    // Drops sharply at the bottom left corner
+    backgroundColor: "#F1F1F4",
+
     borderTopLeftRadius: 18,
     borderTopRightRadius: 18,
     borderBottomLeftRadius: 4,
     borderBottomRightRadius: 18,
   },
+
   messageText: {
     fontSize: 15,
-    lineHeight: 20,
+    lineHeight: 22,
+
+    // Vertical breathing room
+    marginBottom: 0,
+
     letterSpacing: -0.1,
   },
+
   ownText: {
     color: "#FFFFFF",
   },
+
   otherText: {
-    color: "#09090B", // High-contrast ink
+    color: "#09090B",
   },
+
+  // Horizontal spacing so text doesn't hit timestamp
   timeSpacer: {
     fontSize: 11,
   },
+
   time: {
     fontSize: 10,
+
     position: "absolute",
+
+    // Slightly lower for better visual balance
     bottom: 6,
     right: 12,
   },
+
   ownTime: {
-    color: "rgba(255, 255, 255, 0.65)", // Semitransparent white to prevent high contrast fatigue
+    color: "rgba(255,255,255,0.65)",
   },
+
   otherTime: {
-    color: "#A1A1AA", // Muted structural gray
+    color: "#A1A1AA",
   },
 });
