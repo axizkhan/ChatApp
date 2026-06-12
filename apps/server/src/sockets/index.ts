@@ -56,5 +56,27 @@ export const initializeSockets = (io: Server) => {
     socket.on(SOCKET_EVENTS.DISCONNECT, (reason) => {
       console.log("Socket disconnected:", reason);
     });
+
+    socket.on(SOCKET_EVENTS.START_TYPING, async () => {
+      const user = await User.findById(socket.data.userId);
+      if (user) {
+        socket.broadcast.emit(SOCKET_EVENTS.USER_TYPING, {
+          userId: user.id,
+          username: user.username,
+          isTyping: true,
+        });
+      }
+    });
+
+    socket.on(SOCKET_EVENTS.STOP_TYPING, async () => {
+      const user = await User.findById(socket.data.userId);
+      if (user) {
+        socket.broadcast.emit(SOCKET_EVENTS.USER_TYPING, {
+          userId: user.id,
+          username: user.username,
+          isTyping: false,
+        });
+      }
+    });
   });
 };

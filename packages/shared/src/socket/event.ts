@@ -7,4 +7,7 @@ export const SOCKET_EVENTS = {
   RECEIVE_MESSAGE: "receive_message",
   MESSAGE_SENT: "message_sent",
   MESSAGE_ERROR: "message_error",
+  START_TYPING: "start_typing",
+  STOP_TYPING: "stop_typing",
+  USER_TYPING: "user_typing",
 } as const;

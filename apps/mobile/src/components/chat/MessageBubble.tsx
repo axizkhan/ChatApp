@@ -7,7 +7,7 @@ interface Props {
   isOwnMessage: boolean;
 }
 
-export const MessageBubble = ({ message, isOwnMessage }: Props) => {
+const MessageBubbleComponent = ({ message, isOwnMessage }: Props) => {
   const formattedTime = new Date(message.createdAt).toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
@@ -45,8 +45,7 @@ export const MessageBubble = ({ message, isOwnMessage }: Props) => {
             styles.time,
             isOwnMessage ? styles.ownTime : styles.otherTime,
           ]}>
-          {formattedTime}{" "}
-          {isOwnMessage && message.status === "sending" && "🕒"}
+          {formattedTime} {isOwnMessage && message.status === "sending" && "🕒"}
           {isOwnMessage && message.status === "sent" && "✓"}
           {isOwnMessage && message.status === "failed" && "⚠️"}
         </Text>
@@ -54,6 +53,14 @@ export const MessageBubble = ({ message, isOwnMessage }: Props) => {
     </View>
   );
 };
+
+export const MessageBubble = React.memo(
+  MessageBubbleComponent,
+  (prev, next) =>
+    prev.message._id === next.message._id &&
+    prev.message.status === next.message.status &&
+    prev.isOwnMessage === next.isOwnMessage,
+);
 
 const styles = StyleSheet.create({
   wrapper: {

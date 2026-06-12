@@ -9,9 +9,9 @@ import {
 
 interface Props {
   onSend: (text: string) => void;
+  onTyping?: () => void;
 }
 
-// A minimal, sleek modern send arrow icon
 const SendArrowIcon = ({ isActive }: { isActive: boolean }) => (
   <View style={[styles.arrowWrapper, isActive && styles.arrowWrapperActive]}>
     <View style={[styles.arrowHead, isActive && styles.arrowHeadActive]} />
@@ -19,9 +19,16 @@ const SendArrowIcon = ({ isActive }: { isActive: boolean }) => (
   </View>
 );
 
-export const MessageInput = ({ onSend }: Props) => {
+export const MessageInput = ({ onSend, onTyping }: Props) => {
   const [text, setText] = useState("");
   const isInputEmpty = !text.trim();
+
+  const handleTextChange = (newText: string) => {
+    setText(newText);
+    if (onTyping) {
+      onTyping();
+    }
+  };
 
   const handleSend = () => {
     if (isInputEmpty) return;
@@ -34,7 +41,7 @@ export const MessageInput = ({ onSend }: Props) => {
       <View style={styles.container}>
         <TextInput
           value={text}
-          onChangeText={setText}
+          onChangeText={handleTextChange}
           placeholder="Message..."
           placeholderTextColor="#A1A1AA"
           style={styles.input}
@@ -58,18 +65,17 @@ const styles = StyleSheet.create({
   wrapper: {
     backgroundColor: "transparent",
     paddingHorizontal: 16,
-    paddingBottom: Platform.OS === "ios" ? 24 : 16, // Extra padding space for modern bottom indicators
+    paddingBottom: Platform.OS === "ios" ? 24 : 16,
     paddingTop: 8,
   },
   container: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF", // Floats cleanly over the main off-white background
-    borderRadius: 24, // Soft, continuous curvature capsule shape
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
     paddingHorizontal: 8,
     paddingVertical: 6,
 
-    // Premium soft elevation depth
     ...Platform.select({
       ios: {
         shadowColor: "#000000",
@@ -89,33 +95,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingTop: Platform.OS === "ios" ? 8 : 6,
     paddingBottom: Platform.OS === "ios" ? 8 : 6,
-    maxHeight: 100, // Safe window limit for long multiline inputs
+    maxHeight: 100,
   },
   button: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: "#6366F1", // Primary brand Indigo accent
+    backgroundColor: "#6366F1",
     justifyContent: "center",
     alignItems: "center",
-    transition: "all 0.2s ease",
   },
   buttonDisabled: {
-    backgroundColor: "#F1F1F4", // Recedes into the bar background when completely empty
+    backgroundColor: "#F1F1F4",
   },
 
-  // Native procedural layouts to mock an arrow vector shape neatly
   arrowWrapper: {
     width: 14,
     height: 14,
     justifyContent: "center",
     alignItems: "center",
-    transform: [{ rotate: "-45deg" }], // Tilts arrow forward into messaging context
+    transform: [{ rotate: "-45deg" }],
     marginLeft: -2,
     marginTop: -1,
   },
   arrowWrapperActive: {
-    transform: [{ rotate: "0deg" }], // Straightens cleanly into an upright state when ready
+    transform: [{ rotate: "0deg" }],
   },
   arrowHead: {
     width: 8,

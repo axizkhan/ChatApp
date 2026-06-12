@@ -7,6 +7,7 @@ import {
   StyleSheet,
   View,
   Keyboard,
+  Text,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -21,7 +22,7 @@ import { ChatHeader } from "../components/chat/ChatHeader";
 import { ConnectionStatusComp } from "../components/chat/ConnectionStatus";
 import { EmptyChat } from "../components/chat/EmptyChat";
 import { KeyboardSafeView } from "../layout/KeyboardSafeView";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 
 export const ChatScreen = () => {
   const { user, logout } = useAuth();
@@ -30,7 +31,11 @@ export const ChatScreen = () => {
   const [socketStatus, setSocketStatus] = useState<
     "connected" | "disconnected" | "reconnecting"
   >("connected");
+  const [typingUsers, setTypingUsers] = useState<
+    { userId: string; username: string }[]
+  >([]);
   const flatListRef = useRef<FlatList>(null);
+  const typingTimer = useRef<NodeJS.Timeout>(null);
   const insets = useSafeAreaInsets();
   const initialBottomInset = useRef(insets.bottom).current;
 
@@ -64,6 +69,25 @@ export const ChatScreen = () => {
       setSocketStatus("reconnecting"),
     );
 
+    socketService.on(
+      SOCKET_EVENTS.USER_TYPING,
+      (payload: { userId: string; username: string; isTyping: boolean }) => {
+        setTypingUsers((prev) => {
+          if (payload.isTyping) {
+            if (!prev.find((u) => u.userId === payload.userId)) {
+              return [
+                ...prev,
+                { userId: payload.userId, username: payload.username },
+              ];
+            }
+            return prev;
+          } else {
+            return prev.filter((u) => u.userId !== payload.userId);
+          }
+        });
+      },
+    );
+
     // Auto scroll to bottom when keyboard opens
     const kbSub = Keyboard.addListener("keyboardDidShow", () => {
       setTimeout(() => {
@@ -76,9 +100,22 @@ export const ChatScreen = () => {
       socketService.off("connect");
       socketService.off("disconnect");
       socketService.off("reconnect_attempt");
+      socketService.off(SOCKET_EVENTS.USER_TYPING);
       kbSub.remove();
     };
   }, []);
+
+  const handleTyping = () => {
+    if (!typingTimer.current) {
+      socketService.emit(SOCKET_EVENTS.START_TYPING);
+    } else {
+      clearTimeout(typingTimer.current);
+    }
+    typingTimer.current = setTimeout(() => {
+      socketService.emit(SOCKET_EVENTS.STOP_TYPING);
+      typingTimer.current = null;
+    }, 1000);
+  };
 
   const handleSendMessage = (text: string) => {
     if (!text.trim()) return;
@@ -121,6 +158,16 @@ export const ChatScreen = () => {
     );
   };
 
+  const renderMessage = useCallback(
+    ({ item }: { item: Message }) => (
+      <MessageBubble
+        message={item}
+        isOwnMessage={item.senderId === user?.id}
+      />
+    ),
+    [user?.id],
+  );
+
   if (loading) {
     return (
       <View style={styles.loaderContainer}>
@@ -147,13 +194,8 @@ export const ChatScreen = () => {
         <FlatList
           ref={flatListRef}
           data={messages}
-          keyExtractor={(item) => item._id}
-          renderItem={({ item }) => (
-            <MessageBubble
-              message={item}
-              isOwnMessage={item.senderId === user?.id}
-            />
-          )}
+          keyExtractor={(item) => item._id as string}
+          renderItem={renderMessage}
           contentContainerStyle={styles.chatContainer}
           ListEmptyComponent={<EmptyChat />}
           keyboardDismissMode="on-drag"
@@ -162,10 +204,25 @@ export const ChatScreen = () => {
           onContentSizeChange={() => {
             flatListRef.current?.scrollToEnd({ animated: true });
           }}
+          initialNumToRender={20}
+          maxToRenderPerBatch={10}
+          windowSize={10}
+          removeClippedSubviews={true}
         />
 
+        {typingUsers.length > 0 && (
+          <View style={styles.typingIndicator}>
+            <Text style={styles.typingText}>
+              {typingUsers.map((u) => u.username).join(", ")}{" "}
+              {typingUsers.length === 1 ? "is" : "are"} typing...
+            </Text>
+          </View>
+        )}
         <View style={styles.inputContainer}>
-          <MessageInput onSend={handleSendMessage} />
+          <MessageInput
+            onSend={handleSendMessage}
+            onTyping={handleTyping}
+          />
         </View>
       </KeyboardSafeView>
     </View>
@@ -200,5 +257,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingTop: 8,
     paddingBottom: 8,
+  },
+
+  typingIndicator: {
+    paddingHorizontal: 16,
+    paddingVertical: 4,
+  },
+  typingText: {
+    fontSize: 12,
+    color: "#64748B",
+    fontStyle: "italic",
   },
 });
