@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { Eye, EyeOff } from "lucide-react-native";
 import {
   ActivityIndicator,
   Alert,
@@ -24,6 +25,7 @@ export const LoginScreen = ({ navigation }: Props) => {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const validateForm = () => {
@@ -88,20 +90,32 @@ export const LoginScreen = ({ navigation }: Props) => {
           onSubmitEditing={() => passwordInputRef.current?.focus()}
         />
 
-        <TextInput
-          ref={passwordInputRef}
-          placeholder="Password"
-          placeholderTextColor="#A1A1AA"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-          style={styles.input}
-          autoCapitalize="none"
-          autoCorrect={false}
-          returnKeyType="done"
-          editable={!loading}
-          onSubmitEditing={handleLogin}
-        />
+        <View style={styles.passwordContainer}>
+          <TextInput
+            ref={passwordInputRef}
+            placeholder="Password"
+            placeholderTextColor="#A1A1AA"
+            secureTextEntry={!showPassword}
+            value={password}
+            onChangeText={setPassword}
+            style={styles.passwordInput}
+            autoCapitalize="none"
+            autoCorrect={false}
+            returnKeyType="done"
+            editable={!loading}
+            onSubmitEditing={handleLogin}
+          />
+          <TouchableOpacity
+            style={styles.eyeIcon}
+            onPress={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? (
+              <EyeOff size={20} color="#A1A1AA" />
+            ) : (
+              <Eye size={20} color="#A1A1AA" />
+            )}
+          </TouchableOpacity>
+        </View>
 
         <TouchableOpacity
           style={[styles.primaryButton, loading && styles.buttonDisabled]}
@@ -162,6 +176,23 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     fontSize: 16,
     color: "#09090B",
+  },
+  passwordContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F1F1F4",
+    borderRadius: 14,
+    marginBottom: 16,
+  },
+  passwordInput: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    fontSize: 16,
+    color: "#09090B",
+  },
+  eyeIcon: {
+    padding: 16,
   },
   primaryButton: {
     backgroundColor: "#6366F1", // Indigo Accent color
