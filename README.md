@@ -1,17 +1,17 @@
 # Realtime Chat Application
 
-A high-performance, real-time messaging system built with React Native and Socket.io. This project is engineered with a strict focus on mobile UX, offline-resilient architecture, and enterprise-grade scalability. 
+A high-performance, real-time messaging system built with React Native and Socket.io. This project is engineered with a strict focus on mobile UX, offline-resilient architecture, and enterprise-grade scalability.
 
 [Insert Professional Screenshot Here]
 
 ## Architecture
 
-At a high level, the system separates the client-side rendering layer from a real-time event-driven Node.js backend. 
+At a high level, the system separates the client-side rendering layer from a real-time event-driven Node.js backend.
 
-Mobile Client (React Native) 
+Mobile Client (React Native)
 -> REST API (Authentication & Message History)
 -> Socket.io (Bi-directional Real-Time Events)
--> Express Server 
+-> Express Server
 -> MongoDB (Persistence)
 
 ## Features
@@ -26,14 +26,14 @@ Mobile Client (React Native)
 
 ## Tech Stack
 
-| Layer | Technology | Purpose |
-| --- | --- | --- |
-| Frontend | React Native / Expo | Cross-platform mobile client |
-| Backend | Node.js / Express | REST API and server logic |
-| Realtime | Socket.io | Bi-directional communication |
-| Database | MongoDB | Persistent storage |
-| State Management | React Hooks | Local UI state |
-| Monorepo | Turborepo / Yarn | Workspace management |
+| Layer            | Technology          | Purpose                      |
+| ---------------- | ------------------- | ---------------------------- |
+| Frontend         | React Native / Expo | Cross-platform mobile client |
+| Backend          | Node.js / Express   | REST API and server logic    |
+| Realtime         | Socket.io           | Bi-directional communication |
+| Database         | MongoDB             | Persistent storage           |
+| State Management | React Hooks         | Local UI state               |
+| Monorepo         | Turborepo / Yarn    | Workspace management         |
 
 ## Monorepo Structure
 
@@ -91,11 +91,13 @@ sequenceDiagram
 ## Environment Variables
 
 Server (.env):
+
 - PORT: Port for the Express server (default 3000)
 - MONGODB_URI: Connection string for MongoDB
 - JWT_SECRET: Secret key for signing tokens
 
 Mobile (.env):
+
 - EXPO_PUBLIC_API_URL: HTTP endpoint for REST endpoints
 - EXPO_PUBLIC_SOCKET_URL: WebSocket endpoint for Socket.io
 
@@ -116,3 +118,24 @@ This application implements several production-grade optimization patterns to en
 - Optimistic UI & Acknowledgments: User actions render instantly on the client using temporary IDs, deferring to server-side Socket acknowledgments to resolve their final state, resulting in zero perceived latency.
 - Memoized FlatList: The chat interface utilizes `React.memo` with a custom deep-comparison function to ensure that only messages with changing statuses or content re-render. Coupled with strict FlatList virtualization props, this enables the client to render 10,000+ messages without memory leaks.
 - Debounced Typing: Input events are debounced using mutable refs, ensuring the server isn't flooded with `START_TYPING` events on every keystroke.
+
+## User Credentials
+
+### 1st User
+
+Username = alex
+password = 123456
+
+## 2nd User
+
+Username = taher
+password 123456
+
+## Video Link
+
+Note: The video was recorded on two separate devices and later merged together into a single video. It could not be uploaded to Loom because the free account has upload limitations, so the final video has been shared via Google Drive instead.
+https://drive.google.com/file/d/1z1DRg2t6ewziz78cCG-RBdFdrCE9Aqki/view?usp=drive_link
+
+## APK Link
+
+https://drive.google.com/file/d/1ZVDpMIJTixePiqc9yG5xNkrBSte9Ory0/view?usp=drive_link

@@ -8,7 +8,6 @@ import { AuthNavigator } from "./AuthNavigator";
 import { useAuth } from "../hooks/useAuth";
 
 export const RootNavigator = () => {
-  console.log(useAuth());
   const { token, loading } = useAuth();
 
   if (loading) {
