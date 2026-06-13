@@ -231,10 +231,23 @@ export const ChatScreen = () => {
           renderItem={renderMessage}
           contentContainerStyle={styles.chatContainer}
           ListEmptyComponent={<EmptyChat />}
+          ListFooterComponent={
+            typingUsers.length > 0 ? (
+              <View style={styles.typingIndicator}>
+                <Text style={styles.typingText}>
+                  {typingUsers.map((u) => u.username).join(", ")}{" "}
+                  {typingUsers.length === 1 ? "is" : "are"} typing...
+                </Text>
+              </View>
+            ) : null
+          }
           keyboardDismissMode="on-drag"
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
           onContentSizeChange={() => {
+            flatListRef.current?.scrollToEnd({ animated: true });
+          }}
+          onLayout={() => {
             flatListRef.current?.scrollToEnd({ animated: true });
           }}
           initialNumToRender={20}
@@ -242,15 +255,6 @@ export const ChatScreen = () => {
           windowSize={10}
           removeClippedSubviews={true}
         />
-
-        {typingUsers.length > 0 && (
-          <View style={styles.typingIndicator}>
-            <Text style={styles.typingText}>
-              {typingUsers.map((u) => u.username).join(", ")}{" "}
-              {typingUsers.length === 1 ? "is" : "are"} typing...
-            </Text>
-          </View>
-        )}
         <View style={styles.inputContainer}>
           <MessageInput
             onSend={handleSendMessage}
